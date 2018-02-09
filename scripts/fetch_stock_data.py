@@ -35,7 +35,7 @@ def main(symbol_file, parameter_file, output_dir):
 
 			non_params = []
 			
-			print symbol
+			print(symbol)
 
 			for parameter in param_list:
 				parameter=parameter.strip()
@@ -43,7 +43,7 @@ def main(symbol_file, parameter_file, output_dir):
 
 				try:
 					row = client.get_security_metric(symbol, parameter, start_date="01/01/1900")
-				except Exception, e:
+				except(Exception): #maybe need an e
 					if parameter in error_count:
 						error_count[parameter]+=1
 					else:

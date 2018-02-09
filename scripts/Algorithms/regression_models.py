@@ -3,8 +3,7 @@
     Run Stock-Regression Algorithms
 """
 from __future__ import print_function
-from regression_helpers import load_dataset, addFeatures, \
-    mergeDataframes, count_missing, applyTimeLag, performRegression
+from regression_helpers import load_dataset, addFeatures, mergeDataframes, count_missing, applyTimeLag, performRegression
 import sys
 import os
 import pickle
@@ -74,7 +73,7 @@ def main(dir_path, output_dir):
                 symbol, output_dir)
 
             scores[symbol] = [mean_squared_errors, r2_scores]
-        except Exception, e:
+        except(Exception): #maybe needs an e following
             pass
             traceback.print_exc()
     

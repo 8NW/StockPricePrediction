@@ -39,8 +39,8 @@ def main(dir_path):
 			X = [ col[:2] ]
 			y = [ col[-1], col[-2] ]
 
-			print X
-			print y	
+			print(X)
+			print(y)
 			
 			'''
 
@@ -88,9 +88,9 @@ def main(dir_path):
 		else:
 			ranking = selector.ranking_
 
-		print ranking
+		print(ranking)
 
-	print ranking
+	print(ranking)
 
 if __name__ == '__main__':
 	main(sys.argv[1])

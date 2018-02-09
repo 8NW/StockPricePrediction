@@ -26,7 +26,7 @@ import os
 from sklearn.grid_search import GridSearchCV
 from Neural_Network import NeuralNet
 
-def load_dataset(path_directory, symbol): 
+def load_dataset(path_directory, symbol):
     """
         Import DataFrame from Dataset.
     """
@@ -38,16 +38,16 @@ def load_dataset(path_directory, symbol):
 
     #name = path_directory + '/sp.csv'
     #sp = pd.read_csv(name, index_col=0, parse_dates=[1])
-    
+
     #name = path_directory + '/GOOGL.csv'
     #nasdaq = pd.read_csv(name, index_col=1, parse_dates=[1])
-    
+
     #name = path_directory + '/treasury.csv'
     #treasury = pd.read_csv(name, index_col=0, parse_dates=[1])
-    
+
     #return [sp, nasdaq, djia, treasury, hkong, frankfurt, paris, nikkei, london, australia]
     #return [out, nasdaq, djia, frankfurt, hkong, nikkei, australia]
-    return [out]    
+    return [out]
 
 def count_missing(dataframe):
     """
@@ -55,32 +55,32 @@ def count_missing(dataframe):
     """
     return (dataframe.shape[0] * dataframe.shape[1]) - dataframe.count().sum()
 
-    
+
 def addFeatures(dataframe, adjclose, returns, n):
     """
     operates on two columns of dataframe:
     - n >= 2
-    - given Return_* computes the return of day i respect to day i-n. 
+    - given Return_* computes the return of day i respect to day i-n.
     - given AdjClose_* computes its moving average on n days
 
     """
-    
+
     return_n = adjclose[9:] + "Time" + str(n)
     dataframe[return_n] = dataframe[adjclose].pct_change(n)
-    
+
     roll_n = returns[7:] + "RolMean" + str(n)
     dataframe[roll_n] = pd.rolling_mean(dataframe[returns], n)
 
     exp_ma = returns[7:] + "ExponentMovingAvg" + str(n)
     dataframe[exp_ma] = pd.ewma(dataframe[returns], halflife=n)
-    
+
 def mergeDataframes(datasets):
     """
         Merge Datasets into Dataframe.
     """
     return pd.concat(datasets)
 
-    
+
 def applyTimeLag(dataset, lags, delta):
     """
         apply time lag to return columns selected according  to delta.
@@ -97,30 +97,30 @@ def applyTimeLag(dataset, lags, delta):
 
     return dataset.iloc[maxLag:-1, :]
 
-# CLASSIFICATION    
+# CLASSIFICATION
 def prepareDataForClassification(dataset, start_test):
     """
-    generates categorical to be predicted column, attach to dataframe 
+    generates categorical to be predicted column, attach to dataframe
     and label the categories
     """
     le = preprocessing.LabelEncoder()
-    
+
     dataset['UpDown'] = dataset['Return_Out']
     dataset.UpDown[dataset.UpDown >= 0] = 'Up'
     dataset.UpDown[dataset.UpDown < 0] = 'Down'
     dataset.UpDown = le.fit(dataset.UpDown).transform(dataset.UpDown)
-    
+
     features = dataset.columns[1:-1]
-    X = dataset[features]    
-    y = dataset.UpDown    
-    
+    X = dataset[features]
+    y = dataset.UpDown
+
     X_train = X[X.index < start_test]
-    y_train = y[y.index < start_test]    
-    
-    X_test = X[X.index >= start_test]    
+    y_train = y[y.index < start_test]
+
+    X_test = X[X.index >= start_test]
     y_test = y[y.index >= start_test]
-    
-    return X_train, y_train, X_test, y_test    
+
+    return X_train, y_train, X_test, y_test
 
 def prepareDataForModelSelection(X_train, y_train, start_validation):
     """
@@ -128,14 +128,14 @@ def prepareDataForModelSelection(X_train, y_train, start_validation):
     The validation set is mandatory for feature and model selection.
     """
     X = X_train[X_train.index < start_validation]
-    y = y_train[y_train.index < start_validation]    
-    
-    X_val = X_train[X_train.index >= start_validation]    
-    y_val = y_train[y_train.index >= start_validation]   
-    
+    y = y_train[y_train.index < start_validation]
+
+    X_val = X_train[X_train.index >= start_validation]
+    y_val = y_train[y_train.index >= start_validation]
+
     return X, y, X_val, y_val
 
-  
+
 def performClassification(X_train, y_train, X_test, y_test, method, parameters={}):
     """
         Perform Classification with the help of serveral Algorithms.
@@ -146,7 +146,7 @@ def performClassification(X_train, y_train, X_test, y_test, method, parameters={
     print('Size of test set: ', X_test.shape)
     print('Size of train set: ', y_train.shape)
     print('Size of test set: ', y_test.shape)
-    
+
 
     classifiers = [
         RandomForestClassifier(n_estimators=100, n_jobs=-1),
@@ -173,7 +173,7 @@ def benchmark_classifier(clf, X_train, y_train, X_test, y_test):
     return accuracy
 
 # REGRESSION
-    
+
 def getFeatures(X_train, y_train, X_test, num_features):
     ch2 = SelectKBest(chi2, k=5)
     X_train = ch2.fit_transform(X_train, y_train)
@@ -182,7 +182,7 @@ def getFeatures(X_train, y_train, X_test, num_features):
 
 def performRegression(dataset, split, symbol, output_dir):
     """
-        Performing Regression on 
+        Performing Regression on
         Various algorithms
     """
 
@@ -191,7 +191,7 @@ def performRegression(dataset, split, symbol, output_dir):
     train, test = dataset[:index], dataset[index:]
     print('Size of train set: ', train.shape)
     print('Size of test set: ', test.shape)
-    
+
     #train, test = getFeatures(train[features], \
     #    train[output], test[features], 16)
 
@@ -223,7 +223,7 @@ def performRegression(dataset, split, symbol, output_dir):
     predicted_values.append(benchmark_model(classifier, \
         train, test, features, output, out_params, \
         fine_tune=False, maxiter=maxiter, SGD=True, batch=batch, rho=0.9))
-    
+
 
     print('-'*80)
 
